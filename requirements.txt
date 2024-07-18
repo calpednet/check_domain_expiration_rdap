@@ -1,0 +1,4 @@
+nagiosplugin
+pandas
+pyunycode
+requests_cache
