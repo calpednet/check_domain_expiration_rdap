@@ -22,7 +22,7 @@ def expiration(domain):
         '/tmp/iana_rdap_cache',
         cache_control=True
     )
-    req = session.get('https://data.iana.org/rdap/dns.json')
+    req = session.get('https://data.iana.org/rdap/dns.json', timeout=120)
     for k,v in req.json()['services']:
         for x in k:
             list2dict.append({'name':x, 'url':v[0]})
@@ -58,7 +58,7 @@ def expiration(domain):
             )
         case _:
             pass
-    
+
     _log.debug(f'The used RDAP JSON is {req_rdap.json()}')
 
     raw_expiration = [
@@ -76,7 +76,7 @@ def expiration(domain):
 
     today = datetime.datetime.now()
     delta = datetime.datetime.strptime(fecha, '%Y-%m-%d') - today
-    return(delta.days)
+    return delta.days
 
 
 # data acquisition
