@@ -15,21 +15,21 @@ import requests_cache
 
 _log = logging.getLogger('nagiosplugin')
 
-list2dict = []
-
-session = requests_cache.CachedSession(
-    '/tmp/iana_rdap_cache', 
-    cache_control=True
-)
-req = session.get('https://data.iana.org/rdap/dns.json')
-for list_of_list in req.json()['services']:
-    k,v = list_of_list
-    for x in k:
-        list2dict.append({'name':x, 'url':v[0]})
-
-df = pandas.DataFrame(list2dict)
-
 def expiration(domain):
+    list2dict = []
+
+    session = requests_cache.CachedSession(
+        '/tmp/iana_rdap_cache',
+        cache_control=True
+    )
+    req = session.get('https://data.iana.org/rdap/dns.json')
+    for list_of_list in req.json()['services']:
+        k,v = list_of_list
+        for x in k:
+            list2dict.append({'name':x, 'url':v[0]})
+
+    df = pandas.DataFrame(list2dict)
+
     domain = pyunycode.convert(domain)
     tld = domain.split('.')[-1]
     try:
