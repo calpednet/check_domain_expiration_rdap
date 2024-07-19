@@ -40,7 +40,27 @@ def expiration(domain):
             f'The TLD {tld} does not have an RDAP server'
         )
 
+    _log.debug(f'The used RDAP server is {url}')
+
     req_rdap = requests.get(f'{url}domain/{domain}')
+
+    match req_rdap.status_code:
+        case 403:
+            raise nagiosplugin.CheckError(
+                f'Got {req_rdap.status_code}, the RDAP server {url} refused to reply'
+            )
+        case 404:
+            raise nagiosplugin.CheckError(
+                f'Got {req_rdap.status_code}, the domain {domain} has not been found'
+            )
+        case 503:
+            raise nagiosplugin.CheckError(
+                f'Got {req_rdap.status_code}, the RDAP server {url} seems broken'
+            )
+        case _:
+            pass
+    
+    _log.debug(f'The used RDAP JSON is {req_rdap.json()}')
 
     raw_expiration = [
         event.get('eventDate', False)
@@ -52,7 +72,7 @@ def expiration(domain):
         fecha = raw_expiration[0].split('T')[0]
     except IndexError:
         raise nagiosplugin.CheckError(
-            f'The domain {domain} has not been found'
+            f'The domain JSON for {domain} does not have "eventAction"."expiration" field, run with -vvv or --debug to have the JSON dump'
         )
 
     today = datetime.datetime.now()
@@ -117,11 +137,23 @@ def main():
     argp.add_argument(
         '-v', '--verbose', action='count', default=0, help='be more verbose'
     )
+    argp.add_argument(
+        '-d', '--debug', action='count', default=0,
+        help='debug logging to /tmp/nagios-check_domain_expiration_rdap.log'
+    )
     argp.add_argument('domain')
     args = argp.parse_args()
     wrange = f'@{args.critical}:{args.warning}'
     crange = f'@~:{args.critical}'
     fmetric = '{value} days until domain expires'
+
+    if (args.debug):
+        logging.basicConfig(
+            filename='/tmp/nagios-check_domain_expiration_rdap.log',
+            encoding='utf-8',
+            format='%(asctime)s %(message)s',
+            level=logging.DEBUG
+        )
 
     check = nagiosplugin.Check(
         Expiration(args.domain),
