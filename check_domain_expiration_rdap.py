@@ -23,8 +23,7 @@ def expiration(domain):
         cache_control=True
     )
     req = session.get('https://data.iana.org/rdap/dns.json')
-    for list_of_list in req.json()['services']:
-        k,v = list_of_list
+    for k,v in req.json()['services']:
         for x in k:
             list2dict.append({'name':x, 'url':v[0]})
 
