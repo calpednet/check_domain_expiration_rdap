@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# Copyright 2024 Alarig Le Lay <alarig@swordarmor.fr>
+# Distributed under the terms of the GNU General Public License v3
+
 import argparse
 import datetime
 import logging
