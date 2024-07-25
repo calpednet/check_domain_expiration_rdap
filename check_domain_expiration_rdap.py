@@ -157,8 +157,8 @@ class Expiration(nagiosplugin.Resource):
 
     Get the expiration date from RDAP.
     The RDAP server is extracted from https://data.iana.org/rdap/dns.json which
-    cached to avoid useless fetching; but the JSON from the registry RDAP isn’t
-    cached because we can’t presume of the data lifetime.
+    cached to avoid useless fetching; but the JSON from the registry RDAP is
+    not cached because we can not presume of the data lifetime.
     """
 
     def __init__(self, domain):
