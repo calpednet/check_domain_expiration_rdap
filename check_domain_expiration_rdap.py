@@ -105,10 +105,13 @@ def parse_ldap(domain, rdap_server):
 
     return raw_expiration
 
-def expiration(domain):
+def expiration(domain, server):
     """Find the expiration date for the domain."""
 
-    raw_expiration = parse_ldap(domain, find_rdap_server(domain))
+    if server is None:
+        raw_expiration = parse_ldap(domain, find_rdap_server(domain))
+    else:
+        raw_expiration = parse_ldap(domain, server)
 
     # we have parsed the eventAction field about expiration
     if isinstance(raw_expiration[0], int):
@@ -161,12 +164,13 @@ class Expiration(nagiosplugin.Resource):
     not cached because we can not presume of the data lifetime.
     """
 
-    def __init__(self, domain):
+    def __init__(self, domain, server):
         self.domain = domain
+        self.server = server
 
     def probe(self):
         try:
-            days_to_expiration = expiration(self.domain)
+            days_to_expiration = expiration(self.domain, self.server)
         except requests.exceptions.ConnectionError as err:
             raise nagiosplugin.CheckError(
                 f'The connection to the RDAP server failed: {err}'
@@ -207,6 +211,9 @@ def main():
         help='critical expiration max days. Default=15'
     )
     argp.add_argument(
+        '-s', '--server', default=None, help='Specify the RDAP base URL (eg. https://rdap.nic.bzh/)'
+    )
+    argp.add_argument(
         '-v', '--verbose', action='count', default=0, help='be more verbose'
     )
     argp.add_argument(
@@ -229,7 +236,7 @@ def main():
 
     domain = pyunycode.convert(args.domain)
     check = nagiosplugin.Check(
-        Expiration(domain),
+        Expiration(domain, args.server),
         nagiosplugin.ScalarContext(
             'daystoexpiration',
             warning=wrange,
