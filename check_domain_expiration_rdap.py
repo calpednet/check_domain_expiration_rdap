@@ -97,7 +97,8 @@ def parse_ldap(domain, rdap_server):
                 raw_expiration.append(line[3])
 
     elif len(raw_expiration) == 1:
-        fecha = raw_expiration[0].split('T')[0]
+        fecha = raw_expiration[0].split('T')[0].strip().split()
+        fecha = fecha[0]
         today = datetime.datetime.now()
         delta = datetime.datetime.strptime(fecha, '%Y-%m-%d') - today
         raw_expiration[0] = delta.days
