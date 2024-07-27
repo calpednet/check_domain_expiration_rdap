@@ -41,7 +41,7 @@ def find_rdap_server(domain):
     # no rdap on tld
     except IndexError:
         raise nagiosplugin.CheckError(
-            f'The TLD {tld} does not have an RDAP server'
+            f'The TLD {tld} does not have an RDAP server, try forcing the registrar server with --server. It can be found on https://www.iana.org/assignments/registrar-ids/registrar-ids.xhtml'
         )
 
     _log.debug(f'The used RDAP server is {url}')
@@ -124,10 +124,11 @@ def expiration(domain, server):
     elif isinstance(raw_expiration[0], str):
         import csv
         # fetch csv
-        iana_registrars_csv = session.get(
+        iana_registrars_req = session.get(
             'https://www.iana.org/assignments/registrar-ids/registrar-ids-1.csv',
             timeout=120
-        ).content.decode('utf-8')
+        )
+        iana_registrars_csv = iana_registrars_req.content.decode('utf-8')
         # parse csv
         registrar_rdap_found = False
         for registrar_row in csv.reader(
@@ -148,7 +149,7 @@ def expiration(domain, server):
                     )
         if not(registrar_rdap_found):
             raise nagiosplugin.CheckError(
-                f'The registrar {raw_expiration[0]} is not fond from {iana_registrars_csv.url}'
+                f'The registrar {raw_expiration[0]} is not found from {iana_registrars_req.url}'
             )
 
     else:
