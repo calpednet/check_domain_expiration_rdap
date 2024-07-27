@@ -7,6 +7,7 @@ import argparse
 import datetime
 import logging
 import os
+import pathlib
 import requests
 
 import nagiosplugin
@@ -18,10 +19,20 @@ __version__ = '0.1'
 _log = logging.getLogger('nagiosplugin')
 
 # cache session for json and csv storage
-session = requests_cache.CachedSession(
-    '/tmp/iana_rdap_cache',
-    cache_control=True
-)
+uid = os.getuid()
+home = pathlib.Path.home()
+for possible_dir in [f'/run/{uid}', home, '/tmp']:
+    iana_rdap_cache = f'{possible_dir}/iana_rdap_cache'
+    try:
+        cache = open(f'{iana_rdap_cache}.sqlite', 'a')
+        cache.close()
+        session = requests_cache.CachedSession(iana_rdap_cache, cache_control=True)
+        _log.debug(f'Caching to {iana_rdap_cache}.sqlite')
+        break
+    except IOError:
+        _log.debug(f'{iana_rdap_cache}.sqlite is not writtable')
+        session = requests
+        iana_rdap_cache = ''
 
 def find_rdap_server(domain):
     """Find the TLD rdap server."""
