@@ -1,5 +1,7 @@
 Script intented to check a domain expiration with a query to the corresponding
-RDAP server.
+RDAP server. The RDAP server for the TLD is extracted from the IANA JSON RDAP.
+If the expiration field isn’t found on the TLD server, the script falls back to
+the registrar server.
 
 This script is inspired from
 https://raw.githubusercontent.com/buanzo/check_expiration_rdap/main/src/nagios_check_domain_expiration_rdap/nagios_check_domain_expiration_rdap.py
@@ -8,9 +10,9 @@ and `/usr/lib/python3.11/site-packages/nagiosplugin/examples/`
 The script assumes that the TLD has only one label while looking for the RDAP
 server from the IANA JSON. If it’s not the case it will fail.
 
-I don’t understand half of what I wrote
-
 Have fun.
+
+For all the options, run `./check_domain_expiration_rdap.py -h`
 
 Here are the tested cases:
 ```shell
