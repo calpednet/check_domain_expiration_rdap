@@ -6,10 +6,14 @@
 import argparse
 import datetime
 import logging
+import os
 import requests
 
 import nagiosplugin
 import requests_cache
+
+__script__ = os.path.basename(__file__)
+__version__ = '0.1'
 
 _log = logging.getLogger('nagiosplugin')
 
@@ -214,7 +218,10 @@ def main():
         '-s', '--server', default=None, help='Specify the RDAP base URL (eg. https://rdap.nic.bzh/)'
     )
     argp.add_argument(
-        '-v', '--verbose', action='count', default=0, help='be more verbose'
+        '-v', '--verbose', action='count', default=0, help='Be more verbose, can go up to -vvv'
+    )
+    argp.add_argument(
+        '--version', action='version', version=f'{__script__} {__version__}', help='Print version'
     )
     argp.add_argument(
         '-d', '--debug', action='count', default=0,
