@@ -255,8 +255,13 @@ def main():
         )
 
     domain = pyunycode.convert(args.domain)
+    # be sure that the provided server url ends with / for future concat
+    if (isinstance(args.server, str) and args.server[-1] != '/'):
+        server = args.server + '/'
+    else:
+        server = args.server
     check = nagiosplugin.Check(
-        Expiration(domain, args.server),
+        Expiration(domain, server),
         nagiosplugin.ScalarContext(
             'daystoexpiration',
             warning=wrange,
