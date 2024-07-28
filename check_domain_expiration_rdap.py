@@ -64,6 +64,10 @@ def parse_ldap(domain, rdap_server):
     req_rdap = requests.get(f'{rdap_server}domain/{domain}')
 
     match req_rdap.status_code:
+        case 400:
+            raise nagiosplugin.CheckError(
+                f'Got {req_rdap.status_code}, the RDAP server {rdap_server} interprets this domain query as a bad request'
+            )
         case 403:
             raise nagiosplugin.CheckError(
                 f'Got {req_rdap.status_code}, the RDAP server {rdap_server} refused to reply'
