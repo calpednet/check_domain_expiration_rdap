@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2024 Alarig Le Lay <alarig@swordarmor.fr>
+# Copyright 2025 Alarig Le Lay <alarig@swordarmor.fr>
 # Distributed under the terms of the GNU General Public License v3
 
 import argparse
@@ -93,6 +93,7 @@ def parse_ldap(domain, rdap_server):
         event.get('eventDate', False)
         for event in req_rdap.json().get('events', {})
         if event.get('eventAction', {}) == 'expiration'
+        or event.get('eventAction', {}) == 'registrar expiration'
     ]
 
     # if we have not found the field expiration in the list eventAction
